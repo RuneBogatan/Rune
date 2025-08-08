@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Rune</title>
+  <style>
+    body {
+      background: black;
+      color: #00FF66;
+      font-family: monospace;
+      padding: 20px;
+    }
+    button {
+      background: black;
+      color: #00FF66;
+      padding: 10px;
+      border: 1px solid #00FF66;
+      margin: 5px;
+      cursor: pointer;
+    }
+    #zona_output {
+      white-space: pre-wrap;
+      border: 1px solid #00FF66;
+      padding: 10px;
+      min-height: 400px;
+      margin-top: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      color: #00FF66;
+      margin-top: 20px;
+    }
+    td {
+      border: 1px solid #00FF66;
+      padding: 5px;
+      vertical-align: top;
+    }
+  </style>
+</head>
+<body>
+  <h1>Rune</h1>
+
+  <h2> ᛝ Tiraje Aleatorii</h2>
+  <button onclick="alegeRuna()">1 Rună Aleatorie</button>
+  <button onclick="alege3Rune()">3 Rune (Crucea Nordică)</button>
+  <button onclick="alegeCruceaX()">Crucea în X (9 Rune)</button>
+
+  <h2> ᛞ Tiraje Manuale</h2>
+  <button onclick="selectRunaManual()">1 Rună la alegere</button>
+  <button onclick="select3RuneManual()">3 Rune – la alegere</button>
+  <button onclick="selectCruceaXManual()">Crucea în X – la alegere (spirală)</button>
+  <button onclick="salveazaJurnal()">💾 Salvează jurnalul</button>
+
+  
+<div style="display: flex; flex-direction: row;">
+  
+<div style="display: flex; flex-direction: column; margin-top: 20px;">
+  <b> Hartă vizuală: Crucea în X (pentru tiraj 9 rune)</b>
+  <pre style="font-size: 18px; margin-bottom: 10px;">
+I       -       -       -      II
+-       V       -      VI      -
+-       -       <span style="color:yellow;">IX</span>     -       -
+-     VIII      -     VII      -
+IV      -       -       -     III
+  </pre>
+
+  <b> Schema tiraj 3 rune</b>
+  <pre style="font-size: 16px;">
+Trecut →      Prezent →      Viitor →
+  </pre>
+
+  <b> Legendă poziții Crucea în X</b>
+  <pre style="font-size: 14px;">
+I     – Colțul stânga sus (Nord-Vest)
+II    – Colțul dreapta sus (Nord-Est)
+III   – Colțul dreapta jos (Sud-Est)
+IV    – Colțul stânga jos (Sud-Vest)
+V     – Diagonală din stânga jos spre centru
+VI    – Diagonală din stânga sus spre centru
+VII   – Diagonală din dreapta sus spre centru
+VIII  – Diagonală din dreapta jos spre centru
+IX    – Centru (Poziție de sinteză sau destin)
+  </pre>
+</div>
+
+<div id="zona_output" style="flex: 1; white-space: pre-wrap; border: 1px solid #00FF66; padding: 10px; min-height: 400px; margin-top: 20px;">
+    Aici va apărea tirajul.
+  </div>
+  
+<pre style="border:1px solid #00FF66; padding:10px; margin-left:20px;">
+[1] Mannaz ᛗ
+[2] Gebo ᚷ
+[3] Ansuz ᚨ
+[4] Othila ᛟ
+[5] Uruz ᚢ
+[6] Perthro ᛈ
+[7] Nauthiz ᚾ
+[8] Inguz ᛝ
+[9] Eihwaz ᛇ
+[10] Algiz ᛉ
+[11] Fehu ᚠ
+[12] Wunjo ᚹ
+[13] Jera ᛃ
+[14] Kano ᚲ
+[15] Tiwaz ᛏ
+[16] Berkana ᛒ
+[17] Ehwaz ᛖ
+[18] Laguz ᛚ
+[19] Hagalaz ᚻ
+[20] Raido ᚱ
+[21] Thurisaz ᚦ
+[22] Dagaz ᛞ
+[23] Isa ᛁ
+[24] Sowelu ᛋ
+[25] Mister ?
+
+</pre>
+
+</div>
+
+
+  <script>
+function interpretareRuna(simbol) {
+  const dict = {
+    "ᛁ": "Claritate, introspecție, răbdare.",
+    "ᛇ": "Protecție spirituală, transformare.",
+    "ᛉ": "Apărare, legături divine.",
+    "ᛈ": "Secrete, soartă, revelație.",
+    "ᛜ": "Completare, moștenire, unitate.",
+    "ᛏ": "Curaj, onoare, justiție.",
+    "ᛋ": "Soare, vitalitate, succes.",
+    "ᛂ": "Înțelepciune, comunicare.",
+    "ᛃ": "Relații, călătorie, armonie.",
+    "ᚠ": "Bogăție, începuturi, abundență.",
+    "ᚢ": "Forță, voință, energie brută.",
+    "ᚦ": "Conflict, provocare, rezistență.",
+    "ᚨ": "Inspirație, ordine, conducere.",
+    "ᚱ": "Călătorii, schimbare, mișcare.",
+    "ᚲ": "Foc interior, pasiune, creativitate.",
+    "ᚷ": "Daruri, generozitate, echilibru.",
+    "ᚹ": "Plăcere, bucurie, confort.",
+    "ᚺ": "Transformare, căință, purificare.",
+    "ᚾ": "Limitări, nevoia de adaptare.",
+    "ᛖ": "Înțelepciune, memorie, trecut.",
+    "ᛞ": "Moștenire, tradiție, încheiere.",
+    "ᛗ": "Familie, apartenență, grijă.",
+    "ᛚ": "Intuiție, feminitate, mister.",
+    "ᛟ": "Pământ, rădăcini, casă.",
+    "ᛝ": "Putere spirituală, transcendere."
+  };
+  return dict[simbol] || "";
+}
+
+function afiseaza(text) {
+  let linii = text.split("\n");
+  let out = "";
+  for (let linie of linii) {
+    out += linie + "\n";
+    let rune = linie.match(/[ᛁᛇᛉᛈᛜᛏᛋᛂᛃᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛖᛞᛗᛚᛟᛝ]/g);
+    if (rune) {
+      for (let r of rune) {
+        let expl = interpretareRuna(r);
+        if (expl) out += "   → " + expl + "\n";
+      }
+    }
+  }
+  document.getElementById("zona_output").innerText = out.trim();
+}
+    const rune = [
+      `Rună 1: Mannaz (ᛗ)– Sinele, umanitatea\nSimbol: mintea, cunoașterea de sine, legătura cu ceilalți\nMesaj: Caută echilibru între individualitate și comunitate. Este o zi bună pentru introspecție sau pentru a construi relații bazate pe respect reciproc.\nReflecție: Cum te vezi prin ochii celorlalți? Dar prin ochii proprii?`,
+`Rună 2: Gebo (ᚷ) – Darul, schimbul\nSimbol: echilibru, dăruire, relații echitabile\nMesaj: Primește cu inimă deschisă ceea ce vine spre tine. Darurile pot fi materiale, dar mai ales emoționale sau spirituale.\nReflecție: Dăruiești din abundență sau cu atașament? Ai un schimb echitabil cu cei din jur?`,
+`Rună 3: Ansuz (ᚨ)– Comunicarea divină, inspirația\nSimbol: mesaje, adevăr, vocea interioară sau spirituală\nMesaj: Fii atent la ce se spune și la ce nu se spune. Ascultă-ți intuiția, dar și pe ceilalți. Informația esențială vine uneori pe căi subtile.\nReflecție: Ce vrei cu adevărat să exprimi? Când ai ascultat ultima dată cu adevărat pe cineva sau pe tine?`,
+`Rună 4: Othila (ᛟ)– Moștenirea, eliberarea\nSimbol: teritoriu, rădăcini, bagaje familiale sau ancestrale\nMesaj: Este momentul să păstrezi doar ce ți se potrivește din trecut și să eliberezi restul. Moștenirea nu înseamnă lanțuri.\nReflecție: Ce valori ai primit și ce alegi să transmiți mai departe? Ce ai nevoie să lași în urmă?`,
+`Rună 5: Uruz (ᚢ)– Puterea brută, energia vitală\nSimbol: forță, curaj, instinct, început de ciclu\nMesaj: Energia este disponibilă, dar trebuie canalizată cu înțelepciune. Azi este o zi bună pentru acțiune curajoasă și conștientă.\nReflecție: Unde simți forța vieții în tine? Unde o reprimi? Cum o poți folosi constructiv?`,
+`Rună 6: Perth (ᛈ)– Misterul, soarta\nSimbol: necunoscutul, jocul sorții, intuiția\nMesaj: Ceva ascuns va ieși la lumină. Lasă misterul să se desfășoare fără a-l forța.\nReflecție: Ce parte din tine rămâne nedezvăluită? Ce ești pregătit să afli cu adevărat?`,
+`Rună 7: Nauthiz (ᚾ)– Nevoia, lipsa\nSimbol: restricții, lecții dure, voință interioară\nMesaj: Greutățile actuale sunt necesare pentru maturizare. Ai în tine puterea de a le transforma în înțelepciune.\nReflecție: Ce nevoie reală se ascunde în spatele frustrării? Ce ai de învățat din lipsă?`,
+`Rună 8: Inguz (ᛜ)– Fertilitate, început nou\nSimbol: încheiere și renaștere, creativitate\nMesaj: Un ciclu se încheie și altul se pregătește. E momentul să te deschizi către ceva nou, sănătos.\nReflecție: Ce vrei să creezi acum? Ce vrei să lași în urmă cu recunoștință?`,
+`Rună 9: Eihwaz (ᛇ)– Tranziție, ax spiritual\nSimbol: transformare, echilibru între lumi, putere interioară\nMesaj: Este un timp de maturizare profundă. Ai tărie pentru a face față oricărei tranziții.\nReflecție: Ce etapă de viață se transformă acum? Ce te ancorează în proces?`,
+`Rună 10: Algiz (ᛉ)– Protecție, conexiune divină\nSimbol: instinct, înger păzitor, semne din univers\nMesaj: Ești protejat, dar trebuie să fii vigilent. Urmează-ți instinctul, nu nega avertismentele subtile.\nReflecție: Ce semne ai ignorat? Cine sau ce te protejează fără să-ți dai seama?`,
+`Rună 11: Fehu (ᚠ)– Abundență, avere mobilă\nSimbol: bunuri, început de ciclu, câștig sau pierdere\nMesaj: Ceea ce obții acum are potențial, dar cere atenție. Prosperitatea vine când știi să o gestionezi.\nReflecție: Ce înseamnă „valoare” pentru tine? Ce te definește dincolo de posesiuni?`,
+`Rună 12: Wunjo (ᚹ)– Bucurie, împlinire\nSimbol: armonie, satisfacție, recunoștință\nMesaj: Bucură-te de ce ai și nu lua pacea ca pe ceva garantat. Este momentul pentru recunoștință sinceră.\nReflecție: Ce îți aduce bucurie reală? Cu cine o împarți?`,
+`Rună 13: Jera (ᛃ)– Recolta, timpul potrivit\nSimbol: ciclicitate, muncă răsplătită, răbdare\nMesaj: Ai semănat – acum culegi. Ceva din trecut îți aduce roade azi.\nReflecție: Ce ai cultivat cu intenție? Ce culegi acum și ce ți-ai dori să vezi diferit?`,
+`Rună 14: Kano (ᚲ)– Claritate, făclie interioară\nSimbol: iluminare, creativitate, pasiune\nMesaj: Este momentul să aduci lumină în întuneric. Aprinde-ți flacăra interioară.\nReflecție: Ce te inspiră cu adevărat? Ce te oprește să strălucești?`,
+`Rună 15: Tiwaz (ᛏ)– Adevăr, sacrificiu nobil\nSimbol: onoare, justiție, luptă dreaptă\nMesaj: Fii curajos în a apăra adevărul tău. Unele bătălii merită duse.\nReflecție: Pentru ce ești dispus să lupți cu demnitate? Unde te trădezi prin compromis?`,
+`Rună 16: Berkana (ᛒ)– Naștere, vindecare\nSimbol: creștere, maternitate, început blând\nMesaj: E timpul să îngrijești ceva nou – o relație, un proiect, o parte din tine.\nReflecție: Ce are nevoie de protecție în viața ta acum? Ce crește sub tăcere?`,
+`Rună 17: Ehwaz (ᛖ)– Progres, parteneriat\nSimbol: mișcare în armonie, încredere reciprocă\nMesaj: Evoluția vine din cooperare. Mișcă-te împreună, nu împotriva.\nReflecție: Ce relație cere ajustare? Cine este partenerul tău de drum?`,
+`Rună 18: Laguz (ᛚ)– Intuiție, curgere emoțională\nSimbol: apă, vis, feminitate sacră\nMesaj: Ascultă-ți inima. Lasă-te purtat de flux, nu înota contra lui.\nReflecție: Unde te opui curentului? Ce emoție are nevoie să curgă liber?`,
+`Rună 19: Hagalaz (ᚺ)– Schimbare bruscă, haos creativ\nSimbol: dezintegrare, curățare prin criză\nMesaj: Ceva aparent distructiv aduce eliberare. Acceptă furtuna.\nReflecție: Ce parte din tine trebuie să se prăbușească pentru a renaște?`,
+`Rună 20: Raido (ᚱ)– Călătorie, decizie\nSimbol: drum inițiatic, scop, direcție\nMesaj: Nu contează doar destinația, ci și felul în care mergi. Clarifică-ți intenția.\nReflecție: În ce direcție mergi? Este drumul ales cu adevărat al tău?`,
+`Rună 21: Thurisaz (ᚦ)– Forță, obstacol\nSimbol: protecție agresivă, conflict necesar\nMesaj: Înfruntă ce te oprește. Uneori forța e necesară, dar nu distrugătoare.\nReflecție: Ce barieră îți apără de fapt o rană? Poate fi vindecată altfel?`,
+`Rună 22: Dagaz (ᛞ)– Trezire, transformare\nSimbol: lumină, nou început, eliberare radicală\nMesaj: Este momentul să vezi lucrurile diferit. E ziua în care devii altcineva.\nReflecție: Ce schimbare a venit în tine fără să o forțezi? Ce a ieșit la lumină?`,
+`Rună 23: Isa (ᛁ)– Gheață, stagnare\nSimbol: pauză, îngheț, răbdare\nMesaj: Acum nu e timpul pentru acțiune. Observă, nu reacționa. Totul e în repaus aparent.\nReflecție: Ce parte din viața ta e în așteptare? Poți accepta nemișcarea ca parte din drum?`,
+`Rună 24: Sowelu (ᛋ)– Soare, împlinire\nSimbol: vitalitate, succes, plenitudine\nMesaj: E momentul împlinirii. Lasă lumina ta să strălucească. Ai parcurs drumul.\nReflecție: Ce îți aduce strălucire autentică? Ce îți încarcă sufletul de viață?`,
+`Rună 25: Mister (?)– Destin necunoscut, încredere\nSimbol: necunoscutul, spațiul gol, voia zeilor\nMesaj: Lasă viața să curgă fără să controlezi. Nu ai toate răspunsurile acum – și e perfect așa.\nReflecție: Poți accepta ceea ce nu se poate cunoaște încă? Unde ți-e încrederea când e liniște?`
+    ];
+
+    function clearOutput() {
+      document.getElementById("zona_output").innerHTML = "";
+    }
+
+    function alegeRuna() {
+      const nr = Math.floor(Math.random() * rune.length);
+      clearOutput();
+      document.getElementById("zona_output").innerText = `[Rună aleasă: ${nr + 1}]\n\n` + rune[nr];
+    }
+
+    function alege3Rune() {
+      let indices = [];
+      while (indices.length < 3) {
+        let r = Math.floor(Math.random() * rune.length);
+        if (!indices.includes(r)) indices.push(r);
+      }
+      const [t, p, v] = indices;
+      const text = `Trecut →\n` + rune[t] + `\n\nPrezent →\n` + rune[p] + `\n\nViitor →\n` + rune[v];
+      clearOutput();
+      document.getElementById("zona_output").innerText = text;
+    }
+
+    function alegeCruceaX() {
+      // Random version still uses X layout
+      const poz_keys = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"];
+      const grid = [
+        ["I", "", "", "", "II"],
+        ["", "V", "", "VI", ""],
+        ["", "", "IX", "", ""],
+        ["", "VIII", "", "VII", ""],
+        ["IV", "", "", "", "III"]
+      ];
+      let indices = [];
+      while (indices.length < 9) {
+        let r = Math.floor(Math.random() * rune.length);
+        if (!indices.includes(r)) indices.push(r);
+      }
+      let poz_map = {};
+      poz_keys.forEach((key, i) => {
+        poz_map[key] = rune[indices[i]];
+      });
+
+      let tbl = "<table>";
+      for (let row of grid) {
+        tbl += "<tr>";
+        for (let cell of row) {
+          if (cell && poz_map[cell]) {
+            tbl += `<td><b>[${cell}]</b><br>` + poz_map[cell].replaceAll("\n", "<br>") + `</td>`;
+          } else {
+            tbl += "<td>&nbsp;</td>";
+          }
+        }
+        tbl += "</tr>";
+      }
+      tbl += "</table>";
+      clearOutput();
+      document.getElementById("zona_output").innerHTML = tbl;
+    }
+
+    function selectRunaManual() {
+      const nr = parseInt(prompt("Alege numărul rune (1–25):"));
+      if (nr >= 1 && nr <= 25) {
+        clearOutput();
+        document.getElementById("zona_output").innerText = `[Rună aleasă: ${nr}]\n\n` + rune[nr - 1];
+      } else {
+        alert("Număr invalid. Alege între 1 și 25.");
+      }
+    }
+
+    function select3RuneManual() {
+      const t = parseInt(prompt("Trecut – Rună (1–25):"));
+      const p = parseInt(prompt("Prezent – Rună (1–25):"));
+      const v = parseInt(prompt("Viitor – Rună (1–25):"));
+      if ([t, p, v].every(n => n >= 1 && n <= 25)) {
+        const text = `Trecut →\n` + rune[t - 1] + `\n\nPrezent →\n` + rune[p - 1] + `\n\nViitor →\n` + rune[v - 1];
+        clearOutput();
+        document.getElementById("zona_output").innerText = text;
+      } else {
+        alert("Toate cele 3 rune trebuie să fie între 1 și 25.");
+      }
+    }
+
+    function selectCruceaXManual() {
+      const poz_keys = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"];
+      const grid = [
+        ["I", "", "", "", "II"],
+        ["", "V", "", "VI", ""],
+        ["", "", "IX", "", ""],
+        ["", "VIII", "", "VII", ""],
+        ["IV", "", "", "", "III"]
+      ];
+      let poz_map = {};
+      for (let i = 0; i < poz_keys.length; i++) {
+        let nr = parseInt(prompt(`Alege runa pentru poziția ${poz_keys[i]} (1–25):`));
+        if (nr >= 1 && nr <= 25) {
+          poz_map[poz_keys[i]] = rune[nr - 1];
+        } else {
+          alert("Număr invalid. Oprire.");
+          return;
+        }
+      }
+
+      let tbl = "<table>";
+      for (let row of grid) {
+        tbl += "<tr>";
+        for (let cell of row) {
+          if (cell && poz_map[cell]) {
+            tbl += `<td><b>[${cell}]</b><br>` + poz_map[cell].replaceAll("\n", "<br>") + `</td>`;
+          } else {
+            tbl += "<td>&nbsp;</td>";
+          }
+        }
+        tbl += "</tr>";
+      }
+      tbl += "</table>";
+      clearOutput();
+      document.getElementById("zona_output").innerHTML = tbl;
+    }
+  
+    
+
+  
+    function salveazaJurnal() {
+      const now = new Date();
+      const timestamp = now.toLocaleString('ro-RO');
+      const iso = now.toISOString().slice(0, 19).replace(/:/g, "-");
+
+      const zona = document.getElementById("zona_output");
+      const text = zona.innerText || zona.textContent;
+      if (!text.trim()) {
+        alert("Nimic de salvat. Ecranul este gol.");
+        return;
+      }
+
+      const header = "🕓 Jurnal de tiraj runic – " + timestamp + "\n\n";
+      const fullText = header + text;
+
+      const blob = new Blob([fullText], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "interpretare_rune_" + iso + ".txt";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+</script>
+</body>
+</html>

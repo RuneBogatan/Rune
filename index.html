@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rune – Aplicație PWA</title>
+  <link rel="manifest" href="manifest.json" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</head>
+<body>
+  <iframe src="rune_legenda_OK_final.html" style="width:100%; height:100vh; border:none;"></iframe>
+</body>
+</html>
