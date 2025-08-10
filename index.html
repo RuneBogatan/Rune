@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+# Creăm o versiune completă și reparată a fișierului, cu toate funcțiile originale,
+# textele complete pentru rune și ordonarea corectă la salvare (I..IX).
+html_full = r"""<!DOCTYPE html>
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
@@ -474,3 +476,11 @@ function salveazaJurnal() {
   </script>
 </body>
 </html>
+"""
+
+out_path = "/mnt/data/rune_bogdan_FIX_full.html"
+with open(out_path, "w", encoding="utf-8") as f:
+    f.write(html_full)
+
+out_path
+
